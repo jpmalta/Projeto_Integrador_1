@@ -5,12 +5,11 @@ from mysql.connector import Error
 import time
 import os
 
-# Conecta no banco de dados
+# Conecta no banco de dados (Local)
 connection = mysql.connector.connect(host='localhost',
                                         database='projeto_integrador',
                                         user='root',
                                         password='root')
-# Testa se ele ja esta conectado, se estiver executa uma query
 try:
     if connection.is_connected():
         print("Conectado ao banco de dados\n\n")
