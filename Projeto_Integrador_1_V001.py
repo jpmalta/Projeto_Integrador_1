@@ -12,7 +12,7 @@ max_value = 10000
 connection = mysql.connector.connect(host='localhost',
                                         database='projeto_integrador',
                                         user='root',
-                                        password='root')
+                                        password='112269')
 try:
     if connection.is_connected():
         print("Conectado ao banco de dados\n\n")
@@ -84,7 +84,7 @@ def classify(mp10,mp25,o3,co,no2,so2):
 def menu():
     while True:
         try:
-            option = int(input("Digite a opção desejada:\n1 - Inserir amostra\n2 - Mostra TODAS as Amostras\n3 - Mostra Qualidade do Ar\n4 - Sair\n\nOpção Desejada: "))
+            option = int(input("Digite a opção desejada:\n1 - Inserir amostra\n2 - Mostra TODAS as Amostras\n3 - Mostra Qualidade do Ar\n4 - Deletar amostra\n5 - Sair\n\nOpção Desejada: "))
             if option == 1:
                 try:
                     final_input = user_input()
@@ -115,8 +115,23 @@ def menu():
                     for x in query("SELECT AVG(MP10), AVG(MP25), AVG(O3), AVG(CO), AVG(NO2), AVG(SO2) FROM Amostra;", True):
                         time.sleep(2)
                         classify(x[0],x[1],x[2],x[3],x[4],x[5])
-
+            
             elif option == 4:
+                if check_for_empty_table() == True:
+                    pass
+                else:
+                    for x in query("SELECT * FROM Amostra", True):
+                        time.sleep(2)
+                        print(f"_______________\n\n[AMOSTRA: {x[0]}]\n\n|MP10: {x[1]}\n|MP2,5: {x[2]}\n|O3: {x[3]}\n|CO: {x[4]}\n|SO2: {x[5]}\n_______________\n\n")
+                    
+                    delete = int(input("Digite o ID da amostra que deseja deletar: "))
+                    if query(f"SELECT * FROM Amostra WHERE id = {delete}", True) == []:
+                        print("\n\n[Amostra não encontrada]\n\n")
+                    else:
+                        query(f"DELETE FROM Amostra WHERE id = {delete};")
+                        print("\n\n[Amostra deletada com sucesso]\n\n")
+
+            elif option == 5:
                 print("OBRIGADO POR USAR O PROJETO INTEGRADOR 1 DO GRUPO 7")
                 exit()
 
