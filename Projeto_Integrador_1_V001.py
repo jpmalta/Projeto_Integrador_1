@@ -5,12 +5,14 @@ from mysql.connector import Error
 import time
 import os
 
+# Valor máximo das amostras
+max_value = 10000
+
 # Conecta no banco de dados
 connection = mysql.connector.connect(host='localhost',
                                         database='projeto_integrador',
                                         user='root',
                                         password='root')
-# Testa se ele ja esta conectado, se estiver executa uma query
 try:
     if connection.is_connected():
         print("Conectado ao banco de dados\n\n")
@@ -19,21 +21,31 @@ except Error as e:
     print(e)
     raise SystemExit
 
+def clear_terminal():
+    os.system('cls')
+
 def query(query, fetchall=False):
-    print(query)
+    #print(query)
     try:
         cursor = connection.cursor()
         cursor.execute(query)
         if fetchall:
             return cursor.fetchall()
         else:
-            return cursor.rowcount
+            return cursor.rowcount and cursor.close() and connection.commit() and connection.close()
+        
     except Error as e:
         print('Erro na query')
         print(e)
         raise SystemExit
-    
-    connection.commit()
+
+def check_for_empty_table():
+    if query("SELECT COUNT(*) FROM Amostra", True)[0][0] == 0:
+        os.system('cls')
+        print("\n-------------------------------------")
+        print("\n| Não há amostras no banco de dados |\n")
+        print("-------------------------------------\n")
+        return True
 
 def do_again():
     response = int(input("Gostaria de rodar novamente? [0 - SIM | 1 - NÃO]: "))
@@ -57,11 +69,15 @@ def user_input():
             co = float(input("Digite o valor do CO: "))
             no2 = float(input("Digite o valor do NO2: "))
             so2 = float(input("Digite o valor do SO2: "))
-            classify(mp10,mp25,o3,co,no2,so2)
+            if mp10 < max_value and mp25 < max_value and o3 < max_value and co < max_value and no2 < max_value and so2 < max_value and mp10 >= 0 and mp25 >= 0 and o3 >= 0 and co >= 0 and no2 >= 0 and so2 >= 0:
+                return mp10, mp25, o3, co, no2, so2
+            else:
+                print("\n\n[Digite novamente um valor válido]\n\n")
         except ValueError:
             print("\n\n[Digite novamente um valor válido]\n\n")
 
 def classify(mp10,mp25,o3,co,no2,so2):
+    clear_terminal()
     #Verifica se os valores das variáveis são válidos
     if(mp10 > -1 and mp25 > -1 and o3 > -1 and co > -1 and no2 > -1 and so2 > -1):
         #Verifica a classificação do ar
@@ -78,61 +94,51 @@ def classify(mp10,mp25,o3,co,no2,so2):
         else:
             print("\n\n[Valor digitado não possui categoria]\n\n")
 
-#print("SEJA BEM VINDO AO PROJETO INTEGRADOR 1\n\nDigite os valores para classificar a qualidade de ar\n")
-
-#Printa resultado da query
-
 def menu():
     while True:
         try:
-            #option = int(input("Digite a opção desejada:\n1 - Inserir dados\n2 - Deleta dados\n3 - Verificar Qualidade de Ar\n4 - Verificar Amostras\n5 - Sair\n"))
-            option = int(input("Digite a opção desejada:\n4 - Mostra TODAS as Amostras\n5 - Mostra Qualidade do Ar\n6 - Sair\n\nOpção Desejada: "))
+            option = int(input("Digite a opção desejada:\n1 - Inserir amostra\n2 - Mostra TODAS as Amostras\n3 - Mostra Qualidade do Ar\n4 - Sair\n\nOpção Desejada: "))
             if option == 1:
-                
-                # EM DESENVOLVIMENTO
+                try:
+                    final_input = user_input()
+                    mp10 = final_input[0]
+                    mp25 = final_input[1]
+                    o3 = final_input[2]
+                    co = final_input[3]
+                    no2 = final_input[4]
+                    so2 = final_input[5]
+                    clear_terminal()
+                    query(f"INSERT INTO Amostra (mp10, mp25, o3, co, no2, so2) VALUES ({mp10}, {mp25}, {o3}, {co}, {no2}, {so2});")
+                    print("\n\n[Amostra inserida com sucesso]\n\n")
+                except ValueError:
+                    print("\n\n[Digite novamente um valor válido]\n\n")
 
-                # try:
-                #     mp10 = float(input("Digite o valor do MP10: "))
-                #     mp25 = float(input("Digite o valor do MP2,5: "))
-                #     o3 = float(input("Digite o valor do Ozonio: "))
-                #     co = float(input("Digite o valor do CO: "))
-                #     no2 = float(input("Digite o valor do NO2: "))
-                #     so2 = float(input("Digite o valor do SO2: "))
-                #     query("INSERT INTO Amostra (mp10, mp25, o3, co, no2, so2) VALUES (mp10, mp25, o3, co, no2, so2)")
-                # except ValueError:
-                #     print("\n\n[Digite novamente um valor válido]\n\n")
-                #     user_input()
-                pass
             elif option == 2:
-                #Deleta amostra
-
-                # EM DESENVOLVIMENTO
-
-                pass
+                if check_for_empty_table() == True:
+                    pass
+                else:
+                    for x in query("SELECT * FROM Amostra", True):
+                        time.sleep(2)
+                        print(f"_______________\n\n[AMOSTRA: {x[0]}]\n\n|MP10: {x[1]}\n|MP2,5: {x[2]}\n|O3: {x[3]}\n|CO: {x[4]}\n|SO2: {x[5]}\n_______________\n\n")
+            
             elif option == 3:
-                #Verifica qualidade do ar
+                if check_for_empty_table() == True:
+                    pass
+                else: 
+                    for x in query("SELECT AVG(MP10), AVG(MP25), AVG(O3), AVG(CO), AVG(NO2), AVG(SO2) FROM Amostra;", True):
+                        time.sleep(2)
+                        classify(x[0],x[1],x[2],x[3],x[4],x[5])
 
-                # EM DESENVOLVIMENTO
-
-                pass
             elif option == 4:
-                #Printa as amostras
-                for x in query("SELECT * FROM Amostra", True):
-                    time.sleep(1)
-                    print(f"------------\n[AMOSTRA: {x[0]}]\nMP10: {x[1]}\nMP2,5: {x[2]}\nO3: {x[3]}\nCO: {x[4]}\nSO2: {x[5]}\n------------")
-            elif option == 5:
-                for x in query("SELECT AVG(MP10), AVG(MP25), AVG(O3), AVG(CO), AVG(NO2), AVG(SO2) FROM Amostra;", True):
-                    time.sleep(1)
-                    classify(x[0],x[1],x[2],x[3],x[4],x[5])
-            elif option == 6:
                 print("OBRIGADO POR USAR O PROJETO INTEGRADOR 1 DO GRUPO 7")
                 exit()
 
             else:
-                os.system('cls')
+                clear_terminal()
                 print("\nOpção Inexistente, Tente Novamente.\n")
         except ValueError:
-            os.system('cls')
+            clear_terminal()
             print("\nDigite um NÚMERO válido\n")
 
+print("[SEJA BEM VINDO AO PROJETO INTEGRADOR 1]\n\n")
 menu()
