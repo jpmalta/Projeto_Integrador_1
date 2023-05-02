@@ -47,19 +47,6 @@ def check_for_empty_table():
         print("-------------------------------------\n")
         return True
 
-def do_again():
-    response = int(input("Gostaria de rodar novamente? [0 - SIM | 1 - NÃO]: "))
-    while True:
-        try:
-            if (response == 0):
-                user_input()
-            elif (response == 1):
-                print("\n\n\n\nOBRIGADO POR USAR O PROJETO INTEGRADOR 1 DO GRUPO 7\n\n\n\n")
-                exit()  
-                
-        except ValueError:
-            print("Digite 0 - SIM ou 1 - NÃO")
-
 def user_input():
     while True:
         try:
