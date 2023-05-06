@@ -12,7 +12,7 @@ max_value = 10000
 connection = mysql.connector.connect(host='localhost',
                                         database='projeto_integrador',
                                         user='root',
-                                        password='112269')
+                                        password='root')
 try:
     if connection.is_connected():
         print("Conectado ao banco de dados\n\n")
@@ -84,7 +84,7 @@ def classify(mp10,mp25,o3,co,no2,so2):
 def menu():
     while True:
         try:
-            option = int(input("Digite a opção desejada:\n1 - Inserir amostra\n2 - Mostra TODAS as Amostras\n3 - Mostra Qualidade do Ar\n4 - Deletar amostra\n5 - Sair\n\nOpção Desejada: "))
+            option = int(input("Digite a opção desejada:\n1 - Inserir amostra\n2 - Mostra TODAS as Amostras\n3 - Mostra Qualidade do Ar\n4 - Deletar amostra\n5 - Alterar Amostra\n6 - Sair\n\nOpção Desejada: "))
             if option == 1:
                 try:
                     final_input = user_input()
@@ -100,6 +100,7 @@ def menu():
                 except ValueError:
                     print("\n\n[Digite novamente um valor válido]\n\n")
 
+
             elif option == 2:
                 if check_for_empty_table() == True:
                     pass
@@ -108,6 +109,7 @@ def menu():
                         time.sleep(2)
                         print(f"_______________\n\n[AMOSTRA: {x[0]}]\n\n|MP10: {x[1]}\n|MP2,5: {x[2]}\n|O3: {x[3]}\n|CO: {x[4]}\n|SO2: {x[5]}\n_______________\n\n")
             
+
             elif option == 3:
                 if check_for_empty_table() == True:
                     pass
@@ -116,6 +118,7 @@ def menu():
                         time.sleep(2)
                         classify(x[0],x[1],x[2],x[3],x[4],x[5])
             
+
             elif option == 4:
                 if check_for_empty_table() == True:
                     pass
@@ -131,7 +134,52 @@ def menu():
                         query(f"DELETE FROM Amostra WHERE id = {delete};")
                         print("\n\n[Amostra deletada com sucesso]\n\n")
 
+
             elif option == 5:
+                if check_for_empty_table() == True:
+                    pass
+                else:
+                    for x in query("SELECT * FROM Amostra", True):
+                        time.sleep(2)
+                        print(f"_______________\n\n[AMOSTRA: {x[0]}]\n\n|MP10: {x[1]}\n|MP2,5: {x[2]}\n|O3: {x[3]}\n|CO: {x[4]}\n|SO2: {x[5]}\n_______________\n\n")
+                    
+                    while True:
+                        try:
+                            update = int(input("Digite o ID da amostra que deseja alterar: "))
+                        except ValueError:
+                            print("\n\n[Digite novamente um valor válido]\n\n")
+                        else:
+                            if query(f"SELECT * FROM Amostra WHERE id = {update}", True) == []:
+                                print("\n\n[Amostra não encontrada]\n\n")
+                            else:
+                                particle_option = ["MP10", "MP25", "O3", "CO", "NO2", "SO2"]
+                                break
+                    
+                    while True:
+                        try:
+                            option_table = int(input("Digite o número da opção que deseja alterar:\n1 - MP10\n2 - MP2,5\n3 - O3\n4 - CO\n5 - NO2\n6 - SO2\n\nOpção Desejada: "))
+                        except ValueError:
+                            print("\n\n[Digite novamente um valor válido]\n\n")
+                        else:
+                            if option_table >= 1 and option_table <= 6:
+                                atual = particle_option[option_table - 1]
+                                break
+                            else:
+                                print("\n\n[Digite novamente um valor válido]\n\n")
+
+                    while True:
+                        try:
+                            value = int(input(f"Digite o novo valor: "))
+                        except ValueError:
+                            print("\n\n[Digite novamente um valor válido]\n\n")
+                        else:
+                            if value >= 0:
+                                query(f"UPDATE Amostra SET {atual} = {value} WHERE id = {update};")
+                                print("\n\n[Amostra alterada com sucesso]\n\n")
+                                break
+
+
+            elif option == 6:
                 print("OBRIGADO POR USAR O PROJETO INTEGRADOR 1 DO GRUPO 7")
                 exit()
 
