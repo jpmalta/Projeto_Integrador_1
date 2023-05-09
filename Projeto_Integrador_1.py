@@ -127,12 +127,17 @@ def menu():
                         time.sleep(2)
                         print(f"_______________\n\n[AMOSTRA: {x[0]}]\n\n|MP10: {x[1]}\n|MP2,5: {x[2]}\n|O3: {x[3]}\n|CO: {x[4]}\n|SO2: {x[5]}\n_______________\n\n")
                     
-                    delete = int(input("Digite o ID da amostra que deseja deletar: "))
-                    if query(f"SELECT * FROM Amostra WHERE id = {delete}", True) == []:
-                        print("\n\n[Amostra não encontrada]\n\n")
-                    else:
-                        query(f"DELETE FROM Amostra WHERE id = {delete};")
-                        print("\n\n[Amostra deletada com sucesso]\n\n")
+                    while True:
+                      try:
+                        delete = int(input("Digite o ID da amostra que deseja deletar: "))
+                        except:
+                         print('Valor inválido. Tente novamente!')
+                        else:
+                          if query(f"SELECT * FROM Amostra WHERE id = {delete}", True) == []:
+                              print("\n\n[Amostra não encontrada]\n\n")
+                          else:
+                              query(f"DELETE FROM Amostra WHERE id = {delete};")
+                              print("\n\n[Amostra deletada com sucesso]\n\n")
 
 
             elif option == 5:
@@ -190,5 +195,6 @@ def menu():
             clear_terminal()
             print("\nDigite um NÚMERO válido\n")
 
+#Execução
 print("[SEJA BEM VINDO AO PROJETO INTEGRADOR 1]\n\n")
 menu()
